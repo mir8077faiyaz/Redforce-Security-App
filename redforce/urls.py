@@ -18,7 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/',include(('rforce.urls','rf'),namespace='rf')) ,
     path('accounts/', include('allauth.urls')),
+    path('', include(('rforce.urls','rfl'), namespace='rfl')),
     
 ]
