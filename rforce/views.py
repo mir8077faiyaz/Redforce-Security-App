@@ -14,6 +14,7 @@ def setUpProfile(request):
     if request.method=="POST":
         user=UserInfo.objects.create(
         img=request.POST.get("img_data"),
+        user = request.user
         )
     return render(request,'setUpProfile.html')
 
