@@ -6,5 +6,6 @@ urlpatterns = [
     path('home/', views.home, name='homepage'),
     path('setUpProfile/', views.setUpProfile, name='setUpProfile'),
     path('faceRecog/', views.faceRecog, name='faceRecog'),
+    path('check/', views.check, name='check'),
     #path('face_recog', views.faceRecog, name='face_recog'),
 ]

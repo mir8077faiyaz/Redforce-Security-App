@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import sys
 import cv2
-from .models import UserInfo
+from .models import UserInfo, TestUser
 import face_recognition
 import base64
 import os
@@ -26,28 +26,55 @@ def setUpProfile(request):
     return render(request,'setUpProfile.html')
 
 def faceRecog(request):
-      # implementing fcr
-        db = UserInfo.objects.get(user=request.user)
-        db_img=db.img
-        dbu=db.user
-        #print(dbu)
+    if request.method=="POST":
+        test=TestUser.objects.create(
+        img=request.POST.get("img_data"),
+        user = request.user
+        )
+    
+        return redirect(f"/check/")
+    return render(request,'faceRecog.html')
 
-        with open(f"{dbu}.jpg", "wb") as fh:
-            fh.write(base64.b64decode(db_img))
-        #print(db_img)
 
-        known_image = face_recognition.load_image_file(f"{dbu}.jpg")
-        unknown_image = face_recognition.load_image_file("mir3.jpg")
 
-        known_encoding = face_recognition.face_encodings(known_image)[0]
-        unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-
-        results = face_recognition.compare_faces([known_encoding], unknown_encoding)
-        print(results)
-        f = open(f"{dbu}.jpg", 'w')
-        f.close()
-        os.remove(f.name)
-        return render(request,'faceRecog.html')
+def check(request):
+   
+    db = UserInfo.objects.get(user=request.user)
+    db_img=db.img
+    dbu=db.user
+    print("1")
+    
+    
+    db1 = TestUser.objects.get(user=request.user)
+    db_img1=db1.img
+    dbu1=db1.user
+    print("2")
+    
+    with open(f"{dbu}.jpg", "wb") as fh:
+        fh.write(base64.b64decode(db_img))
+        
+    known_image = face_recognition.load_image_file(f"{dbu}.jpg")
+    known_encoding = face_recognition.face_encodings(known_image)[0]
+    print("3") 
+    
+    with open(f"{dbu1}.jpg", "wb") as fk:
+        fk.write(base64.b64decode(db_img1))
+    unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
+    unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+    print("4") 
+   
+    results = face_recognition.compare_faces([known_encoding], unknown_encoding)
+    print(results)
+    f = open(f"{dbu}.jpg", 'w')
+    f.close()
+    os.remove(f.name)
+    
+    f1 = open(f"{dbu1}.jpg", 'w')
+    f1.close()
+    os.remove(f1.name)
+    
+    return render(request,'faceRecog.html')
+   
 
 
 
