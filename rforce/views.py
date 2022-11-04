@@ -72,8 +72,13 @@ def check(request):
     f1 = open(f"{dbu1}.jpg", 'w')
     f1.close()
     os.remove(f1.name)
+
+    #removing test-user
+    instance =TestUser.objects.get(user=request.user)
+    instance.delete()
     
     return render(request,'faceRecog.html')
+
    
 
 
