@@ -9,7 +9,7 @@ import os
 from django.shortcuts import redirect
 from rforce import models
 from django.contrib import messages
-
+count = 0
 # Create your views here.
 def login(request):
     return render(request,'index.html')
@@ -48,6 +48,7 @@ def faceRecog(request):
         img=request.POST.get("img_data"),
         user = request.user
         )
+        
     
         return redirect(f"/check/")
     return render(request,'faceRecog.html')
@@ -77,6 +78,8 @@ def check(request):
     with open(f"{dbu1}.jpg", "wb") as fk:
         fk.write(base64.b64decode(db_img1))
     unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
+
+    
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     print("4") 
    
@@ -94,11 +97,18 @@ def check(request):
     instance =TestUser.objects.get(user=request.user)
     instance.delete()
     stresult = str(results)
+    global count
     
     if (stresult == "[True]"):
        
         return redirect(f"/home/")     
     else:
+        count=count+1
+        print(count)
+        if(count==3):
+            count = 0
+            return redirect(f"/")
+        
         messages.info(request, 'Baba rasfan u babyboy')
         return redirect(f"/faceRecog/")
      
