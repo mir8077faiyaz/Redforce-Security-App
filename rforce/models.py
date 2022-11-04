@@ -6,3 +6,6 @@ class UserInfo(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     img= models.TextField(unique=True,null=False)
     
+class TestUser(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+    img= models.TextField(unique=True,null=False)

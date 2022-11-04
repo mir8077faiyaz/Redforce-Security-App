@@ -6,6 +6,8 @@ from .models import UserInfo
 import face_recognition
 import base64
 import os
+from django.shortcuts import redirect
+
 # Create your views here.
 def login(request):
     return render(request,'index.html')
@@ -19,7 +21,12 @@ def setUpProfile(request):
         img=request.POST.get("img_data"),
         user = request.user
         )
-        # implementing fcr
+        return redirect(f"/faceRecog/")
+      
+    return render(request,'setUpProfile.html')
+
+def faceRecog(request):
+      # implementing fcr
         db = UserInfo.objects.get(user=request.user)
         db_img=db.img
         dbu=db.user
@@ -40,7 +47,7 @@ def setUpProfile(request):
         f = open(f"{dbu}.jpg", 'w')
         f.close()
         os.remove(f.name)
-    return render(request,'setUpProfile.html')
+        return render(request,'faceRecog.html')
 
 
 
