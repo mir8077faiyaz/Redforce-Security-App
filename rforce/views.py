@@ -7,6 +7,8 @@ import face_recognition
 import base64
 import os
 from django.shortcuts import redirect
+from rforce import models
+from django.contrib import messages
 
 # Create your views here.
 def login(request):
@@ -16,6 +18,21 @@ def home(request):
     return render(request,'home.html')
 
 def setUpProfile(request):
+    
+    
+    user = request.user
+    print(user)
+    alluser =  models.UserInfo.objects.filter()
+    print(alluser)
+    list = []
+    list.append(alluser)
+    
+
+    for i in alluser:
+        if(user==i.user):
+            return redirect(f"/faceRecog/")
+        
+        
     if request.method=="POST":
         user=UserInfo.objects.create(
         img=request.POST.get("img_data"),
@@ -76,8 +93,18 @@ def check(request):
     #removing test-user
     instance =TestUser.objects.get(user=request.user)
     instance.delete()
+    stresult = str(results)
     
-    return render(request,'faceRecog.html')
+    if (stresult == "[True]"):
+       
+        return redirect(f"/home/")     
+    else:
+        messages.info(request, 'Baba rasfan u babyboy')
+        return redirect(f"/faceRecog/")
+     
+       
+    
+    
 
    
 
