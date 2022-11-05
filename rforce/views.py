@@ -83,7 +83,7 @@ def check(request):
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     print("4") 
    
-    results = face_recognition.compare_faces([known_encoding], unknown_encoding)
+    results = face_recognition.compare_faces([known_encoding], unknown_encoding,tolerance=0.45)
     print(results)
     f = open(f"{dbu}.jpg", 'w')
     f.close()
