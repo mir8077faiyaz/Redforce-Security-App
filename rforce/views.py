@@ -79,7 +79,7 @@ def check(request):
         fk.write(base64.b64decode(db_img1))
     unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
 
-    
+      
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     print("4") 
    

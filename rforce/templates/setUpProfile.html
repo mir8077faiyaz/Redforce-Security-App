@@ -11,7 +11,7 @@
   </head>
   <body>
     <section>
-      <div class="bg-light">
+      <div class="bg-light" style="border-bottom: 1px solid darkgrey;">
         {% if user.is_authenticated %}
           <div class="container d-flex justify-content-between p-2">
             <a class="navbar-brand" href="#">
@@ -27,14 +27,12 @@
         {% endif %}
     </section>
     <section>
-        <div class="imagee text-center">
-            <img src="{% static 'images/RedForce_transparent.png' %}" alt="">
-        </div>
         <div class="banner">
-            <h3>Name: Rashidul Hassan</h3>
-            <h4>Email: rashidul173@gmail.com</h4>
+            <h4>Set Up Profile</h4>
+            <p style="color: black; margin-bottom: 0px;"><strong>Username: {{user}}</strong></p>
+            <p style="color: black; margin-bottom: 0px;"><strong>Email: {{user.email}}</strong></p>
             <br>
-            <p><strong>For your security, we want to recognize your face.</strong> </p>
+            <p><strong>Set up your profile with your face. *</strong> </p>
             <div>
               <button id="start-camera">Open Camera</button>
             </div>
@@ -45,7 +43,7 @@
                 <input type="hidden" name="img_data" value="" id="js_data_input"/>
                 <input type="submit" id="click-photo" value="click-photo"/>
               </form>
-              <button id="click-photo">Click Photo</button>
+              
               <canvas id="canvas" width="320" height="240"></canvas>
             </div>
 

@@ -1,3 +1,4 @@
+*{}
 .navbar{
     display: flex;
     background: lightgray;
@@ -36,18 +37,26 @@
   .topbar a p:hover{
     color: black;
   }
-  button{
-    width: 50%;
-    padding: 5px 0px;
-    margin-left: 25%;
-    margin-top: 18%;
+  .banner{
+    text-align: center;
   }
-  /*.close{
-    margin-top: 0px;
-    padding: 0px;
-    width: 20px;
-    display: flex; 
-    align-items: center; 
-    border: none;
-    background: transparent;
-  }*/
+ 
+  .btn-primary{
+    font-weight: 500;
+    padding: 5px 70px;
+    border-radius: 4px;
+    color: white;
+    
+  }
+  .btn-primary:hover{
+    font-weight: 600;
+    padding: 5px 70px;
+    border-radius: 4px;
+    background: white;
+    color: #4F7CE0;
+    border: 4px solid #4F7CE0;
+    transition: 0.3s;
+  }
+  p{
+    color: red;
+  }

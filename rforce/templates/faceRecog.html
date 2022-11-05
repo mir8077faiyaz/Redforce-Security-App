@@ -6,7 +6,7 @@
     {% load static %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="{% static 'setUpProfile.css' %}">
+    <link rel="stylesheet" href="{% static 'faceRecog.css' %}">
   
   </head>
   <body>
@@ -25,34 +25,23 @@
             </div>
           </div>
         {% endif %}
-        {% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+        <!---->
     </section>
     <section>
-        <div class="imagee text-center">
-            <img src="{% static 'images/RedForce_transparent.png' %}" alt="">
-        </div>
-        <div class="banner">
-            <h3>Name: Rashidul Hassan</h3>
-            <h4>Email: rashidul173@gmail.com</h4>
+        <div class="banner" style="padding: 0px 0px;">
             <br>
-            <p><strong>This page is to verify. Please baba rafsan edit this page.</strong> </p>
+            <h3>Face Verification</h3>
+            <p><strong>Please turn on your webcam</strong> </p>
             <div>
-              <button id="start-camera">Open Camera</button>
+              <button class="btn-primary" id="start-camera">Open Camera</button>
             </div>
             <div>
               <video id="video" width="320" height="240" autoplay></video>
               <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="img_data" value="" id="js_data_input"/>
-                <input type="submit" id="click-photo" value="click-photo"/>
+                <input type="submit" id="click-photo" value="CLICK PHOTO"/>
               </form>
-              <button id="click-photo">Click Photo</button>
               <canvas id="canvas" width="320" height="240"></canvas>
             </div>
 
@@ -84,11 +73,10 @@
       console.log(image_data_url); 
       // JPEG base64
       let image_base64 = document.querySelector("#canvas").toDataURL('image/jpeg').replace(/^data:image\/jpeg;base64,/, "");
-
       $('#js_data_input').val(image_base64);    
       });
 
-    
+      
 
 
     </script>
