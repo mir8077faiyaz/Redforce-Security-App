@@ -2,11 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 import sys
 import cv2
+from django.template import RequestContext
 from .models import UserInfo, TestUser
 import face_recognition
 import base64
 import os
 from django.shortcuts import redirect
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import render
 from rforce import models
 count = 0
 stop = 0
@@ -114,7 +117,7 @@ def check(request):
             print(count)
             if(count==3):
                 count = 0
-                return redirect(f"/")
+                return redirect(f"/logout/")
             else:
                 return redirect(f"/faceRecog/")
     except:
@@ -126,11 +129,17 @@ def check(request):
         instance.delete()
         if(count==3):
             count=0
-            return redirect(f"/")
+            return redirect(f"/logout/")
         else:
             return redirect(f"/faceRecog/")
      
-       
+
+
+def logout(request):
+    """Logs out user"""
+    auth_logout(request)
+    #return render('index.html', {}, RequestContext(request))   
+    return render(request,'index.html')    
     
     
 

@@ -8,4 +8,5 @@ urlpatterns = [
     path('faceRecog/', views.faceRecog, name='faceRecog'),
     path('check/', views.check, name='check'),
     #path('face_recog', views.faceRecog, name='face_recog'),
+    path('logout/', views.logout, name='logout'),
 ]
