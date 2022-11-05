@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from rforce import models
 from django.contrib import messages
 count = 0
+stop = 0
 # Create your views here.
 def login(request):
     return render(request,'index.html')
@@ -18,8 +19,9 @@ def home(request):
     return render(request,'home.html')
 
 def setUpProfile(request):
-    
-    
+    global stop
+    if (stop==1):
+        return redirect(f"/faceRecog/")
     user = request.user
     print(user)
     alluser =  models.UserInfo.objects.filter()
@@ -36,8 +38,10 @@ def setUpProfile(request):
     if request.method=="POST":
         user=UserInfo.objects.create(
         img=request.POST.get("img_data"),
-        user = request.user
+        user = request.user,
+        
         )
+        stop = 1
         return redirect(f"/faceRecog/")
       
     return render(request,'setUpProfile.html')
@@ -48,6 +52,8 @@ def faceRecog(request):
         img=request.POST.get("img_data"),
         user = request.user
         )
+        global stop
+        stop=0
         
     
         return redirect(f"/check/")
