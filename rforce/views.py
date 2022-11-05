@@ -125,6 +125,9 @@ def check(request):
         count=count+1
         
         print("An exception occurred")   
+        f1 = open(f"{dbu1}.jpg", 'w')
+        f1.close()
+        os.remove(f1.name)
         instance =TestUser.objects.get(user=request.user)
         instance.delete()
         if(count==3):
