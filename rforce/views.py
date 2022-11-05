@@ -76,46 +76,50 @@ def check(request):
     
     with open(f"{dbu}.jpg", "wb") as fh:
         fh.write(base64.b64decode(db_img))
+    
+    try:       
+        known_image = face_recognition.load_image_file(f"{dbu}.jpg")
+        known_encoding = face_recognition.face_encodings(known_image)[0]
+        print("3") 
         
-    known_image = face_recognition.load_image_file(f"{dbu}.jpg")
-    known_encoding = face_recognition.face_encodings(known_image)[0]
-    print("3") 
-    
-    with open(f"{dbu1}.jpg", "wb") as fk:
-        fk.write(base64.b64decode(db_img1))
-    unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
+        with open(f"{dbu1}.jpg", "wb") as fk:
+            fk.write(base64.b64decode(db_img1))
+        unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
 
-      
-    unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-    print("4") 
-   
-    results = face_recognition.compare_faces([known_encoding], unknown_encoding,tolerance=0.45)
-    print(results)
-    f = open(f"{dbu}.jpg", 'w')
-    f.close()
-    os.remove(f.name)
-    
-    f1 = open(f"{dbu1}.jpg", 'w')
-    f1.close()
-    os.remove(f1.name)
-
-    #removing test-user
-    instance =TestUser.objects.get(user=request.user)
-    instance.delete()
-    stresult = str(results)
-    global count
-    
-    if (stresult == "[True]"):
-       
-        return redirect(f"/home/")     
-    else:
-        count=count+1
-        print(count)
-        if(count==3):
-            count = 0
-            return redirect(f"/")
         
-        messages.info(request, 'Baba rasfan u babyboy')
+        unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+        print("4") 
+    
+        results = face_recognition.compare_faces([known_encoding], unknown_encoding,tolerance=0.45)
+        print(results)
+
+        f = open(f"{dbu}.jpg", 'w')
+        f.close()
+        os.remove(f.name)
+        
+        f1 = open(f"{dbu1}.jpg", 'w')
+        f1.close()
+        os.remove(f1.name)
+
+        #removing test-user
+        instance =TestUser.objects.get(user=request.user)
+        instance.delete()
+        stresult = str(results)
+        global count
+        
+        if (stresult == "[True]"):
+        
+            return redirect(f"/home/")     
+        else:
+            count=count+1
+            print(count)
+            if(count==3):
+                count = 0
+                return redirect(f"/")
+    except:
+        print("An exception occurred")   
+        instance =TestUser.objects.get(user=request.user)
+        instance.delete()
         return redirect(f"/faceRecog/")
      
        
