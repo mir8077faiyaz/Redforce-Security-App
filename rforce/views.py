@@ -8,9 +8,7 @@ import base64
 import os
 from django.shortcuts import redirect
 from rforce import models
-from django.contrib import messages
 count = 0
-count2=0
 stop = 0
 # Create your views here.
 def login(request):
@@ -110,22 +108,24 @@ def check(request):
         
         if (stresult == "[True]"):
         
-            return redirect(f"/home/")     
+            return redirect(f"/home/")          
         else:
             count=count+1
             print(count)
             if(count==3):
                 count = 0
                 return redirect(f"/")
+            else:
+                return redirect(f"/faceRecog/")
     except:
-        global count2
-        count2=count2+1
+        #global count2
+        count=count+1
         
         print("An exception occurred")   
         instance =TestUser.objects.get(user=request.user)
         instance.delete()
-        if(count2==3):
-            count2=0
+        if(count==3):
+            count=0
             return redirect(f"/")
         else:
             return redirect(f"/faceRecog/")
