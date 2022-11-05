@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from rforce import models
 from django.contrib import messages
 count = 0
+count2=0
 stop = 0
 # Create your views here.
 def login(request):
@@ -117,10 +118,17 @@ def check(request):
                 count = 0
                 return redirect(f"/")
     except:
+        global count2
+        count2=count2+1
+        
         print("An exception occurred")   
         instance =TestUser.objects.get(user=request.user)
         instance.delete()
-        return redirect(f"/faceRecog/")
+        if(count2==3):
+            count2=0
+            return redirect(f"/")
+        else:
+            return redirect(f"/faceRecog/")
      
        
     
