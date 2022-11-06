@@ -15,6 +15,7 @@ count = 0
 stop = 0
 # Create your views here.
 def login(request):
+    auth_logout(request)
     return render(request,'index.html')
 
 def home(request):
