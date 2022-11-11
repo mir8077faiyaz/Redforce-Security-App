@@ -11,8 +11,11 @@ from django.shortcuts import redirect
 from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render
 from rforce import models
+import requests
+import json
 count = 0
 stop = 0
+anti="pika"
 # Create your views here.
 def login(request):
     auth_logout(request)
@@ -55,6 +58,8 @@ def faceRecog(request):
         img=request.POST.get("img_data"),
         user = request.user
         )
+        global anti 
+        anti= request.POST.get("img_data2")
         global stop
         stop=0
         
@@ -84,7 +89,29 @@ def check(request):
         known_image = face_recognition.load_image_file(f"{dbu}.jpg")
         known_encoding = face_recognition.face_encodings(known_image)[0]
         print("3") 
-        
+        #Anti-spoofing starts here
+
+        url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
+
+        payload = {
+            "imageUrl":anti,
+            "isface": True
+        }
+        headers = {
+            "content-type": "application/json",
+            "X-RapidAPI-Key": "a5c157836emshff1b311d2ca4376p103370jsn6c6d66b82114",
+            "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
+        }
+
+        response = requests.request("POST", url, json=payload, headers=headers)
+        data = response.json()
+        print(type(data))
+        keys = data.keys()
+        print(keys)
+        print(type(data['predict']))
+
+        print(response.text)
+        #Anti-Spoofing ends here
         with open(f"{dbu1}.jpg", "wb") as fk:
             fk.write(base64.b64decode(db_img1))
         unknown_image = face_recognition.load_image_file(f"{dbu1}.jpg")
@@ -110,7 +137,7 @@ def check(request):
         stresult = str(results)
         global count
         
-        if (stresult == "[True]"):
+        if (stresult == "[True]" and data['predict']=="real"):
         
             return redirect(f"/home/")          
         else:

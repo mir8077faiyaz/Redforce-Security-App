@@ -39,6 +39,7 @@
               <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="img_data" value="" id="js_data_input"/>
+                <input type="hidden" name="img_data2" value="" id="js_data_input2"/>
                 <input type="submit" id="click-photo" value="CLICK PHOTO"/>
               </form>
               <canvas id="canvas" width="320" height="240"></canvas>
@@ -72,7 +73,8 @@
       console.log(image_data_url); 
       // JPEG base64
       let image_base64 = document.querySelector("#canvas").toDataURL('image/jpeg').replace(/^data:image\/jpeg;base64,/, "");
-      $('#js_data_input').val(image_base64);    
+      $('#js_data_input').val(image_base64);   
+      $('#js_data_input2').val(image_data_url);     
       });
 
       
