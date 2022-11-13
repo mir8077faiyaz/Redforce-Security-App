@@ -35,11 +35,9 @@ def setUpProfile(request):
     list = []
     list.append(alluser)
     
-
     for i in alluser:
         if(user==i.user):
-            return redirect(f"/faceRecog/")
-        
+            return redirect(f"/faceRecog/")        
         
     if request.method=="POST":
         user=UserInfo.objects.create(
@@ -61,12 +59,10 @@ def faceRecog(request):
         global anti 
         anti= request.POST.get("img_data2")
         global stop
-        stop=0
-        
+        stop=0   
     
         return redirect(f"/check/")
     return render(request,'faceRecog.html')
-
 
 
 def check(request):
@@ -74,8 +70,7 @@ def check(request):
     db = UserInfo.objects.get(user=request.user)
     db_img=db.img
     dbu=db.user
-    print("1")
-    
+    print("1")   
     
     db1 = TestUser.objects.get(user=request.user)
     db_img1=db1.img
@@ -99,7 +94,7 @@ def check(request):
         }
         headers = {
             "content-type": "application/json",
-            "X-RapidAPI-Key": "a5c157836emshff1b311d2ca4376p103370jsn6c6d66b82114",
+            "X-RapidAPI-Key": "3edf7b5a71mshb18cb7601af0b1bp15d53ajsnbf3ed97aac62",
             "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
         }
 
@@ -162,8 +157,7 @@ def check(request):
             count=0
             return redirect(f"/logout/")
         else:
-            return redirect(f"/faceRecog/")
-     
+            return redirect(f"/faceRecog/")    
 
 
 def logout(request):
@@ -172,12 +166,3 @@ def logout(request):
     #return render('index.html', {}, RequestContext(request))   
     return render(request,'index.html')    
     
-    
-
-   
-
-
-
-
-
-
