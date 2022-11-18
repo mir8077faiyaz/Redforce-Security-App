@@ -36,13 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'django.contrib.sites',
     'rforce.apps.RforceConfig',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django.contrib.staticfiles',
+    'gdstorage',
 ]
 
 MIDDLEWARE = [
@@ -119,6 +120,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'https://www.googleapis.com/auth/drive.metadata.readonly',
         ],
          'APP': {
             'client_id': '704438712498-hevqfs161iguu59d1h4gmgr8e442dn7v.apps.googleusercontent.com',
@@ -131,12 +133,13 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SOCIAL_TOKENS_SAVE = True
 SOCIALACCOUNT_LOGIN_ON_GET=True
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET= True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
-
+GOOGLE_APPLICATION_CREDENTIALS = 'credentials.json'
 SITE_ID = 1
 
 
@@ -163,3 +166,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = 'credentials.json'

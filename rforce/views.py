@@ -13,9 +13,22 @@ from django.shortcuts import render
 from rforce import models
 import requests
 import json
+import google.auth
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
+import os.path
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 count = 0
 stop = 0
 anti="pika"
+
+
 # Create your views here.
 def login(request):
     auth_logout(request)
@@ -84,28 +97,28 @@ def check(request):
         known_image = face_recognition.load_image_file(f"{dbu}.jpg")
         known_encoding = face_recognition.face_encodings(known_image)[0]
         print("3") 
-        #Anti-spoofing starts here
+        # #Anti-spoofing starts here
 
-        url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
+        # url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
 
-        payload = {
-            "imageUrl":anti,
-            "isface": True
-        }
-        headers = {
-            "content-type": "application/json",
-            "X-RapidAPI-Key": "3edf7b5a71mshb18cb7601af0b1bp15d53ajsnbf3ed97aac62",
-            "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
-        }
+        # payload = {
+        #     "imageUrl":anti,
+        #     "isface": True
+        # }
+        # headers = {
+        #     "content-type": "application/json",
+        #     "X-RapidAPI-Key": "3edf7b5a71mshb18cb7601af0b1bp15d53ajsnbf3ed97aac62",
+        #     "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
+        # }
 
-        response = requests.request("POST", url, json=payload, headers=headers)
-        data = response.json()
-        print(type(data))
-        keys = data.keys()
-        print(keys)
-        print(type(data['predict']))
+        # response = requests.request("POST", url, json=payload, headers=headers)
+        # data = response.json()
+        # print(type(data))
+        # keys = data.keys()
+        # print(keys)
+        # print(type(data['predict']))
 
-        print(response.text)
+        # print(response.text)
         #Anti-Spoofing ends here
         with open(f"{dbu1}.jpg", "wb") as fk:
             fk.write(base64.b64decode(db_img1))
@@ -132,7 +145,7 @@ def check(request):
         stresult = str(results)
         global count
         
-        if (stresult == "[True]" and data['predict']=="real"):
+        if (stresult == "[True]"): #and data['predict']=="real"):
         
             return redirect(f"/home/")          
         else:
@@ -166,3 +179,33 @@ def logout(request):
     #return render('index.html', {}, RequestContext(request))   
     return render(request,'index.html')    
     
+
+
+def upload_basic(request):
+    """Insert new file.
+    Returns : Id's of the file uploaded
+
+    Load pre-authorized user credentials from the environment.
+    TODO(developer) - See https://developers.google.com/identity
+    for guides on implementing OAuth2 for the application.
+    """
+    creds, _ = google.auth.default()
+
+    try:
+        # create drive api client
+        service = build('drive', 'v3', credentials=creds)
+
+        file_metadata = {'name': 'download.jpeg'}
+        media = MediaFileUpload('download.jpeg',
+                                mimetype='image/jpeg')
+        # pylint: disable=maybe-no-member
+        file = service.files().create(body=file_metadata, media_body=media,
+                                      fields='id').execute()
+        print(F'File ID: {file.get("id")}')
+
+    except HttpError as error:
+        print(F'An error occurred: {error}')
+        file = None
+
+    return file.get('id')
+
