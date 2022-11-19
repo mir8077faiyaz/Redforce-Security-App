@@ -116,24 +116,26 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-            'https://www.googleapis.com/auth/drive.metadata.readonly',
-        ],
-         'APP': {
-            'client_id': '704438712498-hevqfs161iguu59d1h4gmgr8e442dn7v.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        },
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
-    }
+     'google': {
+          'SCOPE': [
+              'profile',
+              'email',
+              'https://www.googleapis.com/auth/drive',
+          ],
+           'APP': {
+              'client_id': '704438712498-hevqfs161iguu59d1h4gmgr8e442dn7v.apps.googleusercontent.com',
+              'secret': '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',
+              'key': ''
+          },
+         'AUTH_PARAMS': {
+             'access_type': 'online',
+         }
+     }
 }
 
-SOCIAL_TOKENS_SAVE = True
+
+
+SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_LOGIN_ON_GET=True
 SOCIALACCOUNT_QUERY_EMAIL = True
 ACCOUNT_LOGOUT_ON_GET= True
@@ -141,6 +143,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_REQUIRED = True
 GOOGLE_APPLICATION_CREDENTIALS = 'credentials.json'
 SITE_ID = 1
+
 
 
 # Internationalization

@@ -18,7 +18,13 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 import os.path
-
+from allauth.socialaccount.models import SocialAccount, SocialApp
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.http import MediaFileUpload
+from allauth.socialaccount.models import SocialApp
+from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -189,23 +195,38 @@ def upload_basic(request):
     TODO(developer) - See https://developers.google.com/identity
     for guides on implementing OAuth2 for the application.
     """
+    # app_google = SocialApp.objects.get(provider="google")
+    # account = SocialAccount.objects.get(user=request.user)
+    # user_tokens = account.socialtoken_set.first()
+    
+    # creds = Credentials(
+    # token=user_tokens.token,
+    # refresh_token=user_tokens.token_secret,
+    # client_id=app_google.client_id,
+    # client_secret=app_google.secret,
+    # )
+
     creds, _ = google.auth.default()
 
     try:
         # create drive api client
         service = build('drive', 'v3', credentials=creds)
-
+        print("HEllo 1")
         file_metadata = {'name': 'download.jpeg'}
         media = MediaFileUpload('download.jpeg',
                                 mimetype='image/jpeg')
+        print("HEllo 2")
         # pylint: disable=maybe-no-member
         file = service.files().create(body=file_metadata, media_body=media,
                                       fields='id').execute()
-        print(F'File ID: {file.get("id")}')
+        
+        #print(F'File ID: {file.get("id")}')
 
     except HttpError as error:
         print(F'An error occurred: {error}')
         file = None
 
     return file.get('id')
+
+
 

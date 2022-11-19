@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load socialaccount %}
 
   <head>
     <title>Dashboard | Red Force</title>
@@ -20,6 +21,7 @@
         <div class="google" >
           <h4>Login to your account <br> with Google</h4>
           <a title="Google" class="" href="/accounts/google/login/">
+            <!--<a href="{% provider_login_url "google" %}">-->
             <img src="{% static 'images/google_logo.png' %}" width="18px">
             Join with Google
           </a>
