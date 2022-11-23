@@ -31,7 +31,7 @@ from allauth.socialaccount.models import SocialApp
 from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-
+from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -65,8 +65,9 @@ def home(request):
                                                    'files(id, name)',
                                             pageToken=page_token).execute()
     for file in response.get('files', []):
-        print(type({file.get("name")}))    
-        if(str({file.get("name")})=="RedForce"):
+        print(type({file.get("name")}))
+        print(str({file.get("name")}))    
+        if(str({file.get("name")})=="{'Redforce'}"):
             print("mir magi")
             folder_flag=1
             break
@@ -81,9 +82,6 @@ def home(request):
                 
         service.files().create(body=file_metadata).execute()
         
-    
-    
-    
     return render(request,'home.html')
 
 def setUpProfile(request):
@@ -231,7 +229,33 @@ def logout(request):
 
 
 def upload_basic(request):
-   
+    app_google = SocialApp.objects.get(provider="google")
+    account = SocialAccount.objects.get(user=request.user)
+    user_tokens = account.socialtoken_set.first()
+    creds = Credentials(
+    token=user_tokens.token,
+    refresh_token=user_tokens.token_secret,
+    client_id=app_google.client_id,
+    client_secret=app_google.secret,
+                    )
+    service = build('drive', 'v3', credentials=creds)
+
+    folder_id='1m3epYXVev0LEhi63qm-YtcEm5xNUPz2M'
+    file_names=['download.jpeg']
+    mime_types=['image/jpeg']
+
+    for file_name,mime_type in zip(file_names,mime_types):
+        file_metadata={
+            'name':file_name,
+            'parents':[folder_id]
+        }
+    media=MediaFileUpload('{0}'.format(file_name), mimetype=mime_type)
+    service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields='id'
+
+    ).execute()
     return render(request,'home.html')
 
 
