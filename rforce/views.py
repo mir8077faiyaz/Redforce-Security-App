@@ -1,3 +1,5 @@
+from distutils.command import build
+from importlib.metadata import files
 from django.shortcuts import render
 from django.http import HttpResponse
 import sys
@@ -14,10 +16,12 @@ from rforce import models
 import requests
 import json
 import google.auth
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+from google.oauth2.credentials import Credentials
+
 import os.path
+from allauth.socialaccount.models import SocialAccount, SocialApp
+
+from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialAccount, SocialApp
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -27,12 +31,14 @@ from allauth.socialaccount.models import SocialApp
 from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
 count = 0
 stop = 0
 anti="pika"
+
 
 
 # Create your views here.
@@ -41,6 +47,43 @@ def login(request):
     return render(request,'index.html')
 
 def home(request):
+    folder_flag=0
+    app_google = SocialApp.objects.get(provider="google")
+    account = SocialAccount.objects.get(user=request.user)
+    user_tokens = account.socialtoken_set.first()
+    creds = Credentials(
+    token=user_tokens.token,
+    refresh_token=user_tokens.token_secret,
+    client_id=app_google.client_id,
+    client_secret=app_google.secret,
+                    )
+    service = build('drive', 'v3', credentials=creds)
+    page_token = None
+    response = service.files().list(q="mimeType='application/vnd.google-apps.folder'",
+                                            spaces='drive',
+                                            fields='nextPageToken, '
+                                                   'files(id, name)',
+                                            pageToken=page_token).execute()
+    for file in response.get('files', []):
+        print(type({file.get("name")}))    
+        if(str({file.get("name")})=="RedForce"):
+            print("mir magi")
+            folder_flag=1
+            break
+    if(folder_flag==0):
+          
+        folder = 'Redforce'
+                
+        file_metadata = {
+                'name': folder,
+                'mimeType': 'application/vnd.google-apps.folder'
+            }
+                
+        service.files().create(body=file_metadata).execute()
+        
+    
+    
+    
     return render(request,'home.html')
 
 def setUpProfile(request):
@@ -188,17 +231,7 @@ def logout(request):
 
 
 def upload_basic(request):
-    app_google = SocialApp.objects.get(provider="google")
-    account = SocialAccount.objects.get(user=request.user)
-    user_tokens = account.socialtoken_set.first()
-    creds = Credentials(
-    token=user_tokens.token,
-    refresh_token=user_tokens.token_secret,
-    client_id=app_google.client_id,
-        client_secret=app_google.secret,
-        )
-    service = build('drive', 'v3', credentials=creds)
-    print(dir(service))
+   
     return render(request,'home.html')
 
 
