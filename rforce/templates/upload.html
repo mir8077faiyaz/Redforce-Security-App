@@ -47,14 +47,12 @@
      {% endfor %} </ul>-->
     <section>
       
-      <form method="POST">
+      <form method="POST" action ="{% url 'rfl:upload' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="myfile">Select a file:</label>
         <input type="file" id="myfile" name="myfile"><br><br>
         <input type="submit"  name="upfile1" id="myfile1">
         <br> <br>
-        <a href="{% url 'rfl:uploadfile' %}" class="btn-primary" style="padding: 5px 15px;"> SAVE </a>
-        <!--<a href="{% url 'rfl:upload' %}">Upload files on Google Drive</a>-->
       </form>
     </section>
     {% else %}

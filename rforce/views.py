@@ -34,6 +34,8 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from django.core.files.storage import FileSystemStorage
+from cryptography.fernet import Fernet
 
 count = 0
 stop = 0
@@ -85,8 +87,7 @@ def home(request):
 
 def upload(request):
     if request.method=="POST":
-        filename = request.POST.get("myfile")
-        print(type(filename))
+       
         app_google = SocialApp.objects.get(provider="google")
         account = SocialAccount.objects.get(user=request.user)
         user_tokens = account.socialtoken_set.first()
@@ -97,25 +98,37 @@ def upload(request):
         client_secret=app_google.secret,
                         )
         service = build('drive', 'v3', credentials=creds)
-
-        folder_id='1g-AB1VuLZiR2Y0bTvSWLLgGvCGyoQ_1R'
-        file_names=filename
-        mime_types=['image/jpg']
-
-        for file_name,mime_type in zip(file_names,mime_types):
-            file_metadata={
-                'name':file_name,
-                'parents':[folder_id]
-            }
-        media=MediaFileUpload('{0}'.format(file_name), mimetype=mime_type)
+        
+        results = service.files().list(
+            pageSize=10, fields="nextPageToken, files(id, name)").execute()
+        items = results.get('files', [])
+        folder_id=""
+        for item in items:
+            if item['name']=="Redforce":
+                folder_id=item['id']
+                
+        fname=request.FILES['myfile']
+        fs = FileSystemStorage()
+        filename = fs.save(fname.name, fname)
+        uploaded_file_path = fs.path(filename)
+        tname= fname.name
+        Object=request.user
+   
+        
+    
+    
+        file_metadata={
+            'name': tname,
+            'parents' : [folder_id],
+        }
+        mime_Type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        media = MediaFileUpload(uploaded_file_path,mimetype=mime_Type)
+        
         service.files().create(
             body=file_metadata,
             media_body=media,
-            fields='id'
-
-        ).execute()
-    else:
-        print("Else")
+        ).execute() 
+        return redirect(f"/home/")  
     return render(request,'upload.html')
 
 def setUpProfile(request):
