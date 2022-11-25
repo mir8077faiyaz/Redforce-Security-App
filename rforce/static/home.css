@@ -51,3 +51,14 @@
     border: none;
     background: transparent;
   }*/
+  .card{
+    border: 2px solid blue;
+  }
+  a{
+    text-decoration: none;
+  }
+  .card:hover{
+    background: black;
+    color: skyblue;
+    transition: .3s;
+  }

@@ -81,8 +81,42 @@ def home(request):
             }
                 
         service.files().create(body=file_metadata).execute()
-        
     return render(request,'home.html')
+
+def upload(request):
+    if request.method=="POST":
+        filename = request.POST.get("myfile")
+        print(type(filename))
+        app_google = SocialApp.objects.get(provider="google")
+        account = SocialAccount.objects.get(user=request.user)
+        user_tokens = account.socialtoken_set.first()
+        creds = Credentials(
+        token=user_tokens.token,
+        refresh_token=user_tokens.token_secret,
+        client_id=app_google.client_id,
+        client_secret=app_google.secret,
+                        )
+        service = build('drive', 'v3', credentials=creds)
+
+        folder_id='1g-AB1VuLZiR2Y0bTvSWLLgGvCGyoQ_1R'
+        file_names=filename
+        mime_types=['image/jpg']
+
+        for file_name,mime_type in zip(file_names,mime_types):
+            file_metadata={
+                'name':file_name,
+                'parents':[folder_id]
+            }
+        media=MediaFileUpload('{0}'.format(file_name), mimetype=mime_type)
+        service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+
+        ).execute()
+    else:
+        print("Else")
+    return render(request,'upload.html')
 
 def setUpProfile(request):
     global stop
@@ -228,34 +262,39 @@ def logout(request):
     
 
 
-def upload_basic(request):
-    app_google = SocialApp.objects.get(provider="google")
-    account = SocialAccount.objects.get(user=request.user)
-    user_tokens = account.socialtoken_set.first()
-    creds = Credentials(
-    token=user_tokens.token,
-    refresh_token=user_tokens.token_secret,
-    client_id=app_google.client_id,
-    client_secret=app_google.secret,
-                    )
-    service = build('drive', 'v3', credentials=creds)
+def uploadfile(request):
+    if request.method=="POST":
+        filename = request.POST.get("upfile")
+        print(filename)
+        app_google = SocialApp.objects.get(provider="google")
+        account = SocialAccount.objects.get(user=request.user)
+        user_tokens = account.socialtoken_set.first()
+        creds = Credentials(
+        token=user_tokens.token,
+        refresh_token=user_tokens.token_secret,
+        client_id=app_google.client_id,
+        client_secret=app_google.secret,
+                        )
+        service = build('drive', 'v3', credentials=creds)
 
-    folder_id='1m3epYXVev0LEhi63qm-YtcEm5xNUPz2M'
-    file_names=['download.jpeg']
-    mime_types=['image/jpeg']
+        folder_id='1g-AB1VuLZiR2Y0bTvSWLLgGvCGyoQ_1R'
+        file_names=[filename]
+        mime_types=['image/jpeg']
 
-    for file_name,mime_type in zip(file_names,mime_types):
-        file_metadata={
-            'name':file_name,
-            'parents':[folder_id]
-        }
-    media=MediaFileUpload('{0}'.format(file_name), mimetype=mime_type)
-    service.files().create(
-        body=file_metadata,
-        media_body=media,
-        fields='id'
+        for file_name,mime_type in zip(file_names,mime_types):
+            file_metadata={
+                'name':file_name,
+                'parents':[folder_id]
+            }
+        media=MediaFileUpload('{0}'.format(file_name), mimetype=mime_type)
+        service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
 
-    ).execute()
+        ).execute()
+    else:
+        print("Else")
     return render(request,'home.html')
 
 
