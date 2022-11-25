@@ -70,7 +70,6 @@ def home(request):
         print(type({file.get("name")}))
         print(str({file.get("name")}))    
         if(str({file.get("name")})=="{'Redforce'}"):
-            print("mir magi")
             folder_flag=1
             break
     if(folder_flag==0):
@@ -112,7 +111,19 @@ def upload(request):
         filename = fs.save(fname.name, fname)
         uploaded_file_path = fs.path(filename)
         tname= fname.name
-        Object=request.user
+        Object=UserInfo.objects.get(user=request.user)
+        ftool = Fernet(Object.key)
+        
+        data=''
+        with open(uploaded_file_path,'rb') as reader:
+            data=reader.read()
+        print(data)
+        
+        encryptedData=ftool.encrypt(data)
+        
+        with open(uploaded_file_path,'wb') as writer:
+            writer.write(encryptedData)
+            writer.close()
    
         
     
@@ -150,6 +161,7 @@ def setUpProfile(request):
         user=UserInfo.objects.create(
         img=request.POST.get("img_data"),
         user = request.user,
+        key = Fernet.generate_key().decode()
         
         )
         stop = 1
