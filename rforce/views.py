@@ -1,7 +1,10 @@
 from distutils.command import build
 from importlib.metadata import files
+import io
+from urllib import response
 from django.shortcuts import render
 from django.http import HttpResponse
+from googleapiclient.http import MediaIoBaseDownload
 import sys
 import cv2
 from django.template import RequestContext
@@ -21,6 +24,8 @@ from google.oauth2.credentials import Credentials
 import os.path
 from allauth.socialaccount.models import SocialAccount, SocialApp
 
+
+import docx2txt
 from allauth.socialaccount.models import SocialApp
 from allauth.socialaccount.models import SocialAccount, SocialApp
 from google.oauth2.credentials import Credentials
@@ -41,7 +46,17 @@ count = 0
 stop = 0
 anti="pika"
 
-
+from allauth.socialaccount.models import SocialAccount, SocialApp
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.http import MediaFileUpload
+from allauth.socialaccount.models import SocialToken, SocialApp
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseDownload
+import io
+import os
+import docx2txt
 
 # Create your views here.
 def login(request):
@@ -323,4 +338,109 @@ def uploadfile(request):
     return render(request,'home.html')
 
 
+def viewfile(request):
+    app_google = SocialApp.objects.get(provider="google")
+    account = SocialAccount.objects.get(user=request.user)
+    user_tokens = account.socialtoken_set.first()
+    
+    creds = Credentials(
+    token=user_tokens.token,
+    refresh_token=user_tokens.token_secret,
+    client_id=app_google.client_id,
+    client_secret=app_google.secret,
+    )
+    try:
+        service = build('drive', 'v3', credentials=creds)
+        results = service.files().list(
+            pageSize=10, fields="nextPageToken, files(id, name)").execute()
+       
+           
+    
+        results = service.files().list(
+            pageSize=10, fields="nextPageToken, files(id, name)").execute()
+        items = results.get('files', [])
+        if items:
+            folder_id=""
+            for item in items:
+                if item['name']=="Redforce":
+                    folder_id=item['id']
+            page_token = None
+            response = service.files().list(q=f"parents in '{folder_id}'",
+                                                spaces='drive',
+                                                fields='nextPageToken, files(id, name)',
+                                                pageToken=page_token).execute()
+            flist= response.get('files', [])
+            if flist:
+                folder_name=[]
+                folder_ids=[]
+                for item in flist:
+                        folder_name.append(item['name'])
+                        folder_ids.append(item['id'])
+                        page_token = response.get('nextPageToken', None) 
+                        
+                mylist = zip(folder_name, folder_ids)
+                context ={
+                    "object_list": mylist,
+                    }   
+                return render(request, "viewfiles.html", context)       
+    except HttpError as error:
+        print(f'An error occurred: {error}')
+        
+    return render(request, "viewfiles.html")
+
+def openfile(request, id):
+    if request.method == 'GET':
+        app_google = SocialApp.objects.get(provider="google")
+        account = SocialAccount.objects.get(user=request.user)
+        user_tokens = account.socialtoken_set.first()
+    
+        creds = Credentials(
+        token=user_tokens.token,
+        refresh_token=user_tokens.token_secret,
+        client_id=app_google.client_id,
+        client_secret=app_google.secret,
+        )
+        service = build('drive', 'v3', credentials=creds) 
+        # file_id = "1570R_MMQksne3GOppaW4IwsRkZXThqdJ"
+        file_id = id
+        # pylint: disable=maybe-no-member
+        #request = self.drive.files().export_media(fileId=file_id, mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        request1 = service.files().get_media(fileId=file_id)
+        #request1 = service.files().export_media(fileId=file_id, mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        dfile = io.BytesIO()
+        # print(dfile)
+        # print(type(dfile))
+        downloader = MediaIoBaseDownload(dfile, request1)
+        done = False
+        while done is False:
+            print("How")
+            status, done = downloader.next_chunk()
+            print(F'Download {int(status.progress() * 100)}.')
+        fs = FileSystemStorage()
+        filename = fs.save("test.docx", dfile)
+        print("Downloaded")
+        downloaded_file_path = fs.path(filename)
+        Object=UserInfo.objects.get(user=account.user_id)
+        ftool = Fernet(Object.key)
+        
+        with open(downloaded_file_path,'rb') as reader1:
+            data1=reader1.read()
+        
+        decryptedData=ftool.decrypt(data1)
+        
+        with open(downloaded_file_path,'wb') as writer1:
+            writer1.write(decryptedData)
+            
+        my_text = docx2txt.process(downloaded_file_path)
+        
+        text=my_text.splitlines()
+        context ={
+            "object_list": text,
+            }  
+        
+        if os.path.exists(downloaded_file_path):
+            os.remove(downloaded_file_path)
+        
+        return render(request, "fileviewer.html", context) 
+        
 

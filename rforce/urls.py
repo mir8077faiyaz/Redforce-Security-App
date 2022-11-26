@@ -11,4 +11,6 @@ urlpatterns = [
     #path('face_recog', views.faceRecog, name='face_recog'),
     path('logout/', views.logout, name='logout'),
     path('uploadfile/', views.uploadfile, name='uploadfile'),
+    path('viewfile/', views.viewfile, name='viewfile'),
+    path('openfile/<id>/', views.openfile, name='openfile'),
 ]
