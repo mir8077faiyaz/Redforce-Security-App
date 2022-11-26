@@ -13,4 +13,5 @@ urlpatterns = [
     path('uploadfile/', views.uploadfile, name='uploadfile'),
     path('viewfile/', views.viewfile, name='viewfile'),
     path('openfile/<id>/', views.openfile, name='openfile'),
+    path('deletefile/<id>/', views.deletefile, name='deletefile'),
 ]

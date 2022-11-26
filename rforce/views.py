@@ -20,6 +20,7 @@ import requests
 import json
 import google.auth
 from google.oauth2.credentials import Credentials
+from apiclient import errors
 
 import os.path
 from allauth.socialaccount.models import SocialAccount, SocialApp
@@ -443,4 +444,28 @@ def openfile(request, id):
         
         return render(request, "fileviewer.html", context) 
         
+def deletefile(request, id):
+    """Permanently delete a file, skipping the trash.
 
+    Args:
+        service: Drive API service instance.
+        file_id: ID of the file to delete.
+    """
+    try:
+        app_google = SocialApp.objects.get(provider="google")
+        account = SocialAccount.objects.get(user=request.user)
+        user_tokens = account.socialtoken_set.first()
+        creds = Credentials(
+        token=user_tokens.token,
+        refresh_token=user_tokens.token_secret,
+        client_id=app_google.client_id,
+        client_secret=app_google.secret,
+        )
+        service = build('drive', 'v3', credentials=creds)
+    
+        service.files().delete(fileId=id).execute()
+        print("HI")
+    except errors.HttpError:
+        print('An error occurred')
+
+    return render(request, "home.html") 
