@@ -11,21 +11,24 @@
     <link rel="stylesheet" href="{% static 'viewfile.css' %}">
 </head>
 <body>
-    <header>
-        <div class="top-content">
-          {% if user.is_authenticated %}
-          <div class="container d-flex justify-content-between p-2">
-            <!--<a class="navbar-brand" href="#">
-              <img src="{% static 'images/transparent_logo.png' %}" width="105px" height="50px" alt="" class="d-inline-block align-text-top">
-            </a>-->
-            <div class="d-grid gap-2 d-md-flex">
-              <div class="topbar d-md-flex">
-                <a class="text-light" href="{% url 'rfl:logout' %}"><p>Logout</p></a>
-              </div>  
-            </div>
-          {% endif %}
+  <section>
+    <div class="bg-light">
+      {% if user.is_authenticated %}
+        <div class="container d-flex justify-content-between p-2">
+          <a class="navbar-brand" href="#">
+            <img src="{% static 'images/RedForce_transparent.png' %}" width="70px" height="55px" alt="" class="d-inline-block align-text-top">
+          </a>
+          <div class="d-grid gap-2 d-md-flex">
+            <div class="topbar d-md-flex">
+              <a class="text-light" href="{% url 'rfl:homepage' %}"><p>Go Back</p></a>
+            </div> 
+            <div class="topbar d-md-flex" style="padding-left: 20px;">
+              <a class="text-light" href="{% url 'rfl:logout' %}"><p>Logout</p></a>
+            </div>  
+          </div>
         </div>
-    </header>
+      {%endif%}
+  </section>
     <section>
         <div class="container">
             
@@ -39,12 +42,15 @@
                           <div style="padding-bottom: 20px;">
                             <h5 class="card-title">{{name}}</h5>
                           </div>
-                          <div class="buttons">
-                            <a href="{% url 'rfl:openfile' id%}" class="btn btn-primary" style="margin-right: 5px;">Open</a>
+                          <div class="twobtns">
+                            <div class="buttons">
+                              <a href="{% url 'rfl:openfile' id%}" class="btn btn-primary" style="margin-right: 5px;">Open</a>
+                            </div>
+                            <div class="buttons">
+                              <a href="{% url 'rfl:deletefile' id%}" class="btn btn-danger" style="margin-right: 5px;">Delete</a>
+                            </div>
                           </div>
-                          <div class="buttons">
-                            <a href="{% url 'rfl:deletefile' id%}" class="btn btn-primary" style="margin-right: 5px;">Delete</a>
-                          </div>
+                          
                           
                         </div>
                     </div>

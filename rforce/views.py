@@ -102,7 +102,6 @@ def home(request):
 
 def upload(request):
     if request.method=="POST":
-       
         app_google = SocialApp.objects.get(provider="google")
         account = SocialAccount.objects.get(user=request.user)
         user_tokens = account.socialtoken_set.first()
@@ -201,7 +200,7 @@ def faceRecog(request):
 
 
 def check(request):
-   
+    #temp = flag
     db = UserInfo.objects.get(user=request.user)
     db_img=db.img
     dbu=db.user
@@ -267,7 +266,6 @@ def check(request):
         global count
         
         if (stresult == "[True]"): #and data['predict']=="real"):
-        
             return redirect(f"/home/")          
         else:
             count=count+1
