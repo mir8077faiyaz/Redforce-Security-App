@@ -205,12 +205,12 @@ def check(request):
     db = UserInfo.objects.get(user=request.user)
     db_img=db.img
     dbu=db.user
-    print("1")   
+    
     
     db1 = TestUser.objects.get(user=request.user)
     db_img1=db1.img
     dbu1=db1.user
-    print("2")
+    
     
     with open(f"{dbu}.jpg", "wb") as fh:
         fh.write(base64.b64decode(db_img))
@@ -218,7 +218,7 @@ def check(request):
     try:       
         known_image = face_recognition.load_image_file(f"{dbu}.jpg")
         known_encoding = face_recognition.face_encodings(known_image)[0]
-        print("3") 
+         
         # #Anti-spoofing starts here
 
         # url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
@@ -248,8 +248,7 @@ def check(request):
 
         
         unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
-        print("4") 
-    
+        
         results = face_recognition.compare_faces([known_encoding], unknown_encoding,tolerance=0.45)
         print(results)
 
@@ -405,21 +404,18 @@ def openfile(request, id):
         # file_id = "1570R_MMQksne3GOppaW4IwsRkZXThqdJ"
         file_id = id
         # pylint: disable=maybe-no-member
-        #request = self.drive.files().export_media(fileId=file_id, mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         request1 = service.files().get_media(fileId=file_id)
-        #request1 = service.files().export_media(fileId=file_id, mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
         dfile = io.BytesIO()
-        # print(dfile)
-        # print(type(dfile))
+        
         downloader = MediaIoBaseDownload(dfile, request1)
         done = False
         while done is False:
-            print("How")
+            
             status, done = downloader.next_chunk()
             print(F'Download {int(status.progress() * 100)}.')
         fs = FileSystemStorage()
         filename = fs.save("test.docx", dfile)
-        print("Downloaded")
+        
         downloaded_file_path = fs.path(filename)
         Object=UserInfo.objects.get(user=account.user_id)
         ftool = Fernet(Object.key)
@@ -464,7 +460,7 @@ def deletefile(request, id):
         service = build('drive', 'v3', credentials=creds)
     
         service.files().delete(fileId=id).execute()
-        print("HI")
+        
     except errors.HttpError:
         print('An error occurred')
 
