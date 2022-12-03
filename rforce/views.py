@@ -46,6 +46,8 @@ from cryptography.fernet import Fernet
 count = 0
 stop = 0
 anti="pika"
+face_flag=0
+
 
 from allauth.socialaccount.models import SocialAccount, SocialApp
 from google.oauth2.credentials import Credentials
@@ -101,7 +103,14 @@ def home(request):
     return render(request,'home.html')
 
 def upload(request):
+    global face_flag
+    print("face-flag in upload",face_flag)
+    if face_flag!=1:
+        face_flag=1
+        return redirect(f"/faceRecog/")
+    
     if request.method=="POST":
+        face_flag=0
         app_google = SocialApp.objects.get(provider="google")
         account = SocialAccount.objects.get(user=request.user)
         user_tokens = account.socialtoken_set.first()
@@ -154,6 +163,7 @@ def upload(request):
             body=file_metadata,
             media_body=media,
         ).execute() 
+        
         return redirect(f"/home/")  
     return render(request,'upload.html')
 
@@ -201,6 +211,7 @@ def faceRecog(request):
 
 def check(request):
     #temp = flag
+    global face_flag
     db = UserInfo.objects.get(user=request.user)
     db_img=db.img
     dbu=db.user
@@ -266,7 +277,12 @@ def check(request):
         global count
         
         if (stresult == "[True]"): #and data['predict']=="real"):
-            return redirect(f"/home/")          
+            if face_flag==0:
+                return redirect(f"/home/")
+            elif face_flag==1:
+                return redirect(f"/upload/")
+            elif face_flag==2:
+                return redirect(f"/viewfile/")         
         else:
             count=count+1
             print(count)
@@ -294,6 +310,8 @@ def check(request):
 
 def logout(request):
     """Logs out user"""
+    global face_flag
+    face_flag=0
     auth_logout(request)
     #return render('index.html', {}, RequestContext(request))   
     return render(request,'index.html')    
@@ -333,58 +351,67 @@ def uploadfile(request):
         ).execute()
     else:
         print("Else")
+    
     return render(request,'home.html')
 
 
 def viewfile(request):
-    app_google = SocialApp.objects.get(provider="google")
-    account = SocialAccount.objects.get(user=request.user)
-    user_tokens = account.socialtoken_set.first()
-    
-    creds = Credentials(
-    token=user_tokens.token,
-    refresh_token=user_tokens.token_secret,
-    client_id=app_google.client_id,
-    client_secret=app_google.secret,
-    )
-    try:
-        service = build('drive', 'v3', credentials=creds)
-        results = service.files().list(
-            pageSize=10, fields="nextPageToken, files(id, name)").execute()
-       
-           
-    
-        results = service.files().list(
-            pageSize=10, fields="nextPageToken, files(id, name)").execute()
-        items = results.get('files', [])
-        if items:
-            folder_id=""
-            for item in items:
-                if item['name']=="Redforce":
-                    folder_id=item['id']
-            page_token = None
-            response = service.files().list(q=f"parents in '{folder_id}'",
-                                                spaces='drive',
-                                                fields='nextPageToken, files(id, name)',
-                                                pageToken=page_token).execute()
-            flist= response.get('files', [])
-            if flist:
-                folder_name=[]
-                folder_ids=[]
-                for item in flist:
-                        folder_name.append(item['name'])
-                        folder_ids.append(item['id'])
-                        page_token = response.get('nextPageToken', None) 
-                        
-                mylist = zip(folder_name, folder_ids)
-                context ={
-                    "object_list": mylist,
-                    }   
-                return render(request, "viewfiles.html", context)       
-    except HttpError as error:
-        print(f'An error occurred: {error}')
+    global face_flag
+    print("face-flag in viewfile",face_flag)
+    if face_flag!=2:
+        face_flag=2
+        print("face-flag in viewfile2",face_flag)
+        return redirect(f"/faceRecog/")
+    else:
+        face_flag=0
+        app_google = SocialApp.objects.get(provider="google")
+        account = SocialAccount.objects.get(user=request.user)
+        user_tokens = account.socialtoken_set.first()
         
-    return render(request, "viewfiles.html")
+        creds = Credentials(
+        token=user_tokens.token,
+        refresh_token=user_tokens.token_secret,
+        client_id=app_google.client_id,
+        client_secret=app_google.secret,
+        )
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            results = service.files().list(
+                pageSize=10, fields="nextPageToken, files(id, name)").execute()
+        
+            
+        
+            results = service.files().list(
+                pageSize=10, fields="nextPageToken, files(id, name)").execute()
+            items = results.get('files', [])
+            if items:
+                folder_id=""
+                for item in items:
+                    if item['name']=="Redforce":
+                        folder_id=item['id']
+                page_token = None
+                response = service.files().list(q=f"parents in '{folder_id}'",
+                                                    spaces='drive',
+                                                    fields='nextPageToken, files(id, name)',
+                                                    pageToken=page_token).execute()
+                flist= response.get('files', [])
+                if flist:
+                    folder_name=[]
+                    folder_ids=[]
+                    for item in flist:
+                            folder_name.append(item['name'])
+                            folder_ids.append(item['id'])
+                            page_token = response.get('nextPageToken', None) 
+                            
+                    mylist = zip(folder_name, folder_ids)
+                    context ={
+                        "object_list": mylist,
+                        }   
+                    return render(request, "viewfiles.html", context)       
+        except HttpError as error:
+            print(f'An error occurred: {error}')
+        
+        return render(request, "viewfiles.html")
 
 def openfile(request, id):
     if request.method == 'GET':
