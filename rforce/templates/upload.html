@@ -18,9 +18,16 @@
             {% endfor %}
         </ul>-->
         
-
+    
     <section>
       <div class="bg-light">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
         {% if user.is_authenticated %}
           <div class="container d-flex justify-content-between p-2">
             <a class="navbar-brand" href="#">

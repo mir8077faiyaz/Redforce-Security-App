@@ -21,7 +21,7 @@ import json
 import google.auth
 from google.oauth2.credentials import Credentials
 from apiclient import errors
-
+from django.contrib import messages
 import os.path
 from allauth.socialaccount.models import SocialAccount, SocialApp
 
@@ -103,69 +103,72 @@ def home(request):
     return render(request,'home.html')
 
 def upload(request):
-    global face_flag
-    print("face-flag in upload",face_flag)
-    if face_flag!=1:
-        face_flag=1
-        return redirect(f"/faceRecog/")
-    
-    if request.method=="POST":
+    try:
+        global face_flag
+        print("face-flag in upload",face_flag)
+        if face_flag!=1:
+            face_flag=1
+            return redirect(f"/faceRecog/")
+        
+        if request.method=="POST":
+            face_flag=0
+            app_google = SocialApp.objects.get(provider="google")
+            account = SocialAccount.objects.get(user=request.user)
+            user_tokens = account.socialtoken_set.first()
+            creds = Credentials(
+            token=user_tokens.token,
+            refresh_token=user_tokens.token_secret,
+            client_id=app_google.client_id,
+            client_secret=app_google.secret,
+                            )
+            service = build('drive', 'v3', credentials=creds)
+            
+            results = service.files().list(
+                pageSize=10, fields="nextPageToken, files(id, name)").execute()
+            items = results.get('files', [])
+            folder_id=""
+            for item in items:
+                if item['name']=="Redforce":
+                    folder_id=item['id']
+                    
+            fname=request.FILES['myfile']
+            fs = FileSystemStorage()
+            filename = fs.save(fname.name, fname)
+            uploaded_file_path = fs.path(filename)
+            tname= fname.name
+            Object=UserInfo.objects.get(user=request.user)
+            ftool = Fernet(Object.key)
+            
+            data=''
+            with open(uploaded_file_path,'rb') as reader:
+                data=reader.read()
+            print(data)
+            
+            encryptedData=ftool.encrypt(data)
+            
+            with open(uploaded_file_path,'wb') as writer:
+                writer.write(encryptedData)
+                writer.close()
+            file_metadata={
+                'name': tname,
+                'parents' : [folder_id],
+            }
+            mime_Type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            media = MediaFileUpload(uploaded_file_path,mimetype=mime_Type)
+            
+            service.files().create(
+                body=file_metadata,
+                media_body=media,
+            ).execute() 
+            
+            return redirect(f"/home/")  
+        return render(request,'upload.html')
+    except:
         face_flag=0
-        app_google = SocialApp.objects.get(provider="google")
-        account = SocialAccount.objects.get(user=request.user)
-        user_tokens = account.socialtoken_set.first()
-        creds = Credentials(
-        token=user_tokens.token,
-        refresh_token=user_tokens.token_secret,
-        client_id=app_google.client_id,
-        client_secret=app_google.secret,
-                        )
-        service = build('drive', 'v3', credentials=creds)
-        
-        results = service.files().list(
-            pageSize=10, fields="nextPageToken, files(id, name)").execute()
-        items = results.get('files', [])
-        folder_id=""
-        for item in items:
-            if item['name']=="Redforce":
-                folder_id=item['id']
-                
-        fname=request.FILES['myfile']
-        fs = FileSystemStorage()
-        filename = fs.save(fname.name, fname)
-        uploaded_file_path = fs.path(filename)
-        tname= fname.name
-        Object=UserInfo.objects.get(user=request.user)
-        ftool = Fernet(Object.key)
-        
-        data=''
-        with open(uploaded_file_path,'rb') as reader:
-            data=reader.read()
-        print(data)
-        
-        encryptedData=ftool.encrypt(data)
-        
-        with open(uploaded_file_path,'wb') as writer:
-            writer.write(encryptedData)
-            writer.close()
-   
-        
-    
-    
-        file_metadata={
-            'name': tname,
-            'parents' : [folder_id],
-        }
-        mime_Type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        media = MediaFileUpload(uploaded_file_path,mimetype=mime_Type)
-        
-        service.files().create(
-            body=file_metadata,
-            media_body=media,
-        ).execute() 
-        
-        return redirect(f"/home/")  
-    return render(request,'upload.html')
+        messages.info(request, 'Cannot Upload Empty File')
+        return render(request,'upload.html')
+
+
 
 def setUpProfile(request):
     global stop
