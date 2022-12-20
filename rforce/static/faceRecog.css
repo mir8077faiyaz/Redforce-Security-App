@@ -1,7 +1,7 @@
 *{}
 .navbar{
     display: flex;
-    background: lightgray;
+    
   }
   .navbar a{
     font-size: 27px;

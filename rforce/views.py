@@ -155,18 +155,16 @@ def upload(request):
             }
             mime_Type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             media = MediaFileUpload(uploaded_file_path,mimetype=mime_Type)
-            
             service.files().create(
                 body=file_metadata,
                 media_body=media,
             ).execute() 
-            
             return redirect(f"/home/")  
         return render(request,'upload.html')
     except:
         face_flag=0
         messages.info(request, 'Cannot Upload Empty File')
-        return render(request,'upload.html')
+        return render(request,'home.html')
 
 
 
