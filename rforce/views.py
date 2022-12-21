@@ -232,26 +232,26 @@ def check(request):
          
         # #Anti-spoofing starts here
 
-        # url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
+        url = "https://liveness-detection1.p.rapidapi.com/api/v1/liveness-detection"
 
-        # payload = {
-        #     "imageUrl":anti,
-        #     "isface": True
-        # }
-        # headers = {
-        #     "content-type": "application/json",
-        #     "X-RapidAPI-Key": "3edf7b5a71mshb18cb7601af0b1bp15d53ajsnbf3ed97aac62",
-        #     "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
-        # }
+        payload = {
+            "imageUrl":anti,
+            "isface": True
+        }
+        headers = {
+            "content-type": "application/json",
+            "X-RapidAPI-Key": "3edf7b5a71mshb18cb7601af0b1bp15d53ajsnbf3ed97aac62",
+            "X-RapidAPI-Host": "liveness-detection1.p.rapidapi.com"
+        }
 
-        # response = requests.request("POST", url, json=payload, headers=headers)
-        # data = response.json()
-        # print(type(data))
-        # keys = data.keys()
-        # print(keys)
-        # print(type(data['predict']))
+        response = requests.request("POST", url, json=payload, headers=headers)
+        data = response.json()
+        print(type(data))
+        keys = data.keys()
+        print(keys)
+        print(type(data['predict']))
 
-        # print(response.text)
+        print(response.text)
         #Anti-Spoofing ends here
         with open(f"{dbu1}.jpg", "wb") as fk:
             fk.write(base64.b64decode(db_img1))
@@ -277,7 +277,7 @@ def check(request):
         stresult = str(results)
         global count
         
-        if (stresult == "[True]"): #and data['predict']=="real"):
+        if (stresult == "[True]" and data['predict']=="real"):
             if face_flag==0:
                 return redirect(f"/home/")
             elif face_flag==1:

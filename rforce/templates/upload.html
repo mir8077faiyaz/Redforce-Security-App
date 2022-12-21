@@ -56,7 +56,7 @@
      {% endfor %} </ul>-->
     <section>
       
-      <form method="POST" action ="{% url 'rfl:upload' %}" enctype="multipart/form-data">
+      <form method="POST" action ="{% url 'rfl:upload' %}" enctype="multipart/form-data" style="margin: 40px 40px;">
         {% csrf_token %}
         <label for="myfile">Select a file:</label>
         <input type="file" id="myfile" name="myfile"><br><br>
